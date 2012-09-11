@@ -14,8 +14,11 @@ import WriteParser
 processArgs =
 	do	args <- getArgs
 		case args of
-			[inname] -> return (inname, mkoutname inname)
-			[inname, outname] -> return (inname, outname)
+			["--no-check-left-recursion", inname] -> return (True, inname, mkoutname inname)
+			["--no-check-left-recursion", inname, outname] -> return (True, inname, outname)
+			('-' : _) : _ -> error "bad option"
+			[inname] -> return (False, inname, mkoutname inname)
+			[inname, outname] -> return (False, inname, outname)
 			_ -> usage
 
 	where
@@ -28,13 +31,13 @@ processArgs =
 	usage = fail "Usage: pappy <infile> [<outfile>]"
 
 
-processFile inname outname =
+processFile noCheckLR inname outname =
 	do	(n, c, t, g) <- pappyParseFile inname
 		putStrLn ("Original grammar: " ++ show (length g) ++
 			  " size " ++ show (sizeofNonterminals g))
 		--putStrLn (showNonterminals g)
 
-		let	(n', c', t', g') = reduceGrammar (n, c, t, g)
+		let	(n', c', t', g') = reduceGrammar noCheckLR (n, c, t, g)
 		putStrLn ("Reduced grammar: " ++ show (length g') ++
 			  " size " ++ show (sizeofNonterminals g'))
 		--putStrLn (showNonterminals g')
@@ -51,6 +54,6 @@ processFile inname outname =
 		writeFile outname parser
 
 
-main = do	(inname, outname) <- processArgs
-		processFile inname outname
+main = do	(noCheckLR, inname, outname) <- processArgs
+		processFile noCheckLR inname outname
 

@@ -11,8 +11,9 @@ module ReduceGrammar (reduceGrammar) where
 import Pappy
 
 -- Rewrite composite and simple left recursive rules
-reduceGrammar :: Grammar -> Grammar
-reduceGrammar (parsername, topcode, topnts, nonterms) = g'' where
+reduceGrammar :: Bool -> Grammar -> Grammar
+reduceGrammar noCheckLR (parsername, topcode, topnts, nonterms) = if noCheckLR then g' else g''
+	where
 
 	-- First reduce the grammar
 	g' = (parsername, topcode, topnts, reverse (reducents [] nonterms))
