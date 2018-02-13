@@ -36,6 +36,13 @@ infixl 1 <?>		-- error labeling
 infixl 1 <?!>		-- unconditional error labeling
 
 -- Standard monadic combinators
+instance Derivs d => Functor (Parser d) where
+	fmap f m = m >>= return . f
+
+instance Derivs d => Applicative (Parser d) where
+	pure = return
+	mf <*> mx = mf >>= \f -> mx >>= \x -> return $ f x
+
 instance Derivs d => Monad (Parser d) where 
 
 	-- Sequencing combinator
